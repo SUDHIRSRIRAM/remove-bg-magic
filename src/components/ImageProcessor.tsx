@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Image as ImageIcon } from "lucide-react";
 import { useToast } from "./ui/use-toast";
-import backgroundRemoval from "@imgly/background-removal";
+import { removeBackground } from "@imgly/background-removal";
 import { ImageUploader } from "./image-processor/ImageUploader";
 import { BackgroundOptions } from "./image-processor/BackgroundOptions";
 import { ProcessedImage } from "./image-processor/ProcessedImage";
@@ -32,7 +32,7 @@ export const ImageProcessor = () => {
       const response = await fetch(originalImage);
       const blob = await response.blob();
 
-      const result = await backgroundRemoval(blob, {
+      const result = await removeBackground(blob, {
         progress: (progress) => {
           setProgress(Math.round(progress * 100));
         },
