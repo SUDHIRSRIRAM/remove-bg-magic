@@ -15,6 +15,7 @@ export const ImageProcessor = () => {
   const [selectedBackground, setSelectedBackground] = useState<string>("transparent");
   const [customColor, setCustomColor] = useState("#ffffff");
   const [customImageUrl, setCustomImageUrl] = useState("");
+  const [quality, setQuality] = useState(100); // HD quality setting
   const { toast } = useToast();
 
   const handleImageUpload = (file: File) => {
@@ -33,21 +34,58 @@ export const ImageProcessor = () => {
       const blob = await response.blob();
 
       const result = await removeBackground(blob, {
-        progress: (progress) => {
-          setProgress(Math.round(progress * 100));
+        progress: (p: number) => {
+          setProgress(Math.round(p * 100));
         },
-        background: selectedBackground === "transparent" ? undefined : {
-          color: selectedBackground === "custom" ? customColor : selectedBackground,
-          image: selectedBackground === "image" ? customImageUrl : undefined,
-        },
+        output: {
+          quality: quality / 100,
+          format: "image/png"
+        }
       });
 
-      setProcessedImage(URL.createObjectURL(result));
+      // Create a canvas to handle background changes
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        if (ctx) {
+          if (selectedBackground !== "transparent") {
+            // Fill background
+            if (selectedBackground === "custom") {
+              ctx.fillStyle = customColor;
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else if (selectedBackground === "image" && customImageUrl) {
+              const bgImg = new Image();
+              bgImg.onload = () => {
+                ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                setProcessedImage(canvas.toDataURL('image/png', quality / 100));
+              };
+              bgImg.src = customImageUrl;
+              return;
+            } else {
+              ctx.fillStyle = selectedBackground;
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+          }
+          
+          ctx.drawImage(img, 0, 0);
+          setProcessedImage(canvas.toDataURL('image/png', quality / 100));
+        }
+      };
+
+      img.src = URL.createObjectURL(result);
+
       toast({
         title: "Success!",
         description: "Background removed successfully",
       });
     } catch (error) {
+      console.error('Error processing image:', error);
       toast({
         title: "Error",
         description: "Failed to process image",
@@ -62,12 +100,12 @@ export const ImageProcessor = () => {
   const downloadImage = async () => {
     if (!processedImage) return;
 
-    const a = document.createElement("a");
-    a.href = processedImage;
-    a.download = "processed-image.png";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const link = document.createElement("a");
+    link.href = processedImage;
+    link.download = `processed-image-hd-${quality}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const clearImage = () => {
@@ -110,6 +148,8 @@ export const ImageProcessor = () => {
                 <ProcessedImage
                   processedImage={processedImage}
                   onDownload={downloadImage}
+                  quality={quality}
+                  onQualityChange={setQuality}
                 />
               </div>
             </div>
