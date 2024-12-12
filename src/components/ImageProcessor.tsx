@@ -15,7 +15,7 @@ export const ImageProcessor = () => {
   const [selectedBackground, setSelectedBackground] = useState<string>("transparent");
   const [customColor, setCustomColor] = useState("#ffffff");
   const [customImageUrl, setCustomImageUrl] = useState("");
-  const [quality, setQuality] = useState(100); // HD quality setting
+  const [quality, setQuality] = useState(100);
   const { toast } = useToast();
 
   const handleImageUpload = (file: File) => {
@@ -34,8 +34,8 @@ export const ImageProcessor = () => {
       const blob = await response.blob();
 
       const result = await removeBackground(blob, {
-        progress: (p: number) => {
-          setProgress(Math.round(p * 100));
+        progress: (progress: number) => {
+          setProgress(Math.round(progress * 100));
         },
         output: {
           quality: quality / 100,
@@ -43,7 +43,6 @@ export const ImageProcessor = () => {
         }
       });
 
-      // Create a canvas to handle background changes
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
@@ -54,7 +53,6 @@ export const ImageProcessor = () => {
 
         if (ctx) {
           if (selectedBackground !== "transparent") {
-            // Fill background
             if (selectedBackground === "custom") {
               ctx.fillStyle = customColor;
               ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -117,7 +115,7 @@ export const ImageProcessor = () => {
     <div className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4">
         <Tabs defaultValue="single" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full max-w-[600px] mx-auto grid-cols-4 mb-8">
             <TabsTrigger value="single">Single Image</TabsTrigger>
             <TabsTrigger value="bulk">Bulk Upload</TabsTrigger>
             <TabsTrigger value="folder">Folder Upload</TabsTrigger>
@@ -125,7 +123,7 @@ export const ImageProcessor = () => {
           </TabsList>
 
           <TabsContent value="single" className="mt-4">
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-2 gap-8 max-w-[1200px] mx-auto">
               <ImageUploader
                 originalImage={originalImage}
                 isProcessing={isProcessing}
@@ -135,7 +133,7 @@ export const ImageProcessor = () => {
                 onClear={clearImage}
               />
 
-              <div>
+              <div className="space-y-8">
                 <BackgroundOptions
                   selectedBackground={selectedBackground}
                   customColor={customColor}
@@ -156,23 +154,23 @@ export const ImageProcessor = () => {
           </TabsContent>
 
           <TabsContent value="bulk" className="mt-4">
-            <div className="text-center p-8">
+            <div className="text-center p-8 bg-gray-50 rounded-lg">
               <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p>Bulk upload coming soon...</p>
+              <p className="text-gray-600">Bulk upload coming soon...</p>
             </div>
           </TabsContent>
 
           <TabsContent value="folder" className="mt-4">
-            <div className="text-center p-8">
+            <div className="text-center p-8 bg-gray-50 rounded-lg">
               <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p>Folder upload coming soon...</p>
+              <p className="text-gray-600">Folder upload coming soon...</p>
             </div>
           </TabsContent>
 
           <TabsContent value="url" className="mt-4">
-            <div className="text-center p-8">
+            <div className="text-center p-8 bg-gray-50 rounded-lg">
               <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p>Image URL processing coming soon...</p>
+              <p className="text-gray-600">Image URL processing coming soon...</p>
             </div>
           </TabsContent>
         </Tabs>
