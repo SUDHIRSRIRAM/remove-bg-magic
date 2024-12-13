@@ -176,20 +176,32 @@ export const ImageProcessor = () => {
     <div className="py-12 bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Tabs defaultValue="single" className="w-full">
-          <TabsList className="grid w-full max-w-[600px] mx-auto grid-cols-4 mb-8">
-            <TabsTrigger value="single" className="text-sm sm:text-base">
+          <TabsList className="w-full max-w-[600px] mx-auto mb-8 p-1 bg-white border rounded-lg shadow-sm">
+            <TabsTrigger 
+              value="single" 
+              className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all"
+            >
               <ImageIcon className="w-4 h-4 mr-2" />
               Single Image
             </TabsTrigger>
-            <TabsTrigger value="bulk" className="text-sm sm:text-base">
+            <TabsTrigger 
+              value="bulk" 
+              className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all"
+            >
               <Upload className="w-4 h-4 mr-2" />
               Bulk Upload
             </TabsTrigger>
-            <TabsTrigger value="folder" className="text-sm sm:text-base">
+            <TabsTrigger 
+              value="folder" 
+              className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all"
+            >
               <FolderOpen className="w-4 h-4 mr-2" />
               Folder Upload
             </TabsTrigger>
-            <TabsTrigger value="url" className="text-sm sm:text-base">
+            <TabsTrigger 
+              value="url" 
+              className="flex-1 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all"
+            >
               <Link2 className="w-4 h-4 mr-2" />
               Image URL
             </TabsTrigger>
@@ -259,12 +271,12 @@ export const ImageProcessor = () => {
                 <p className="text-gray-600 mb-6">Choose a folder and we'll process all images inside</p>
                 <input
                   type="file"
-                  webkitdirectory=""
-                  directory=""
                   multiple
+                  accept="image/*"
                   onChange={handleFolderUpload}
                   className="hidden"
                   id="folder-upload"
+                  {...{ directory: "", webkitdirectory: "" } as any}
                 />
                 <label htmlFor="folder-upload">
                   <Button asChild>
