@@ -32,7 +32,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased min-h-screen;
   }
 }
 
@@ -51,6 +51,14 @@
 
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600;
+  }
+
+  .image-uploader {
+    @apply border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-primary/50 transition-colors duration-300;
+  }
+
+  .tab-content {
+    @apply p-6 bg-white rounded-lg shadow-sm;
   }
 }
 
@@ -73,4 +81,15 @@
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .tab-content {
+    @apply p-4;
+  }
+  
+  .image-uploader {
+    @apply p-4;
+  }
 }

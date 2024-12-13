@@ -34,8 +34,8 @@ export const ImageProcessor = () => {
       const blob = await response.blob();
 
       const result = await removeBackground(blob, {
-        progress: (progress: number) => {
-          setProgress(Math.round(progress * 100));
+        progress: (_: string, current: number, total: number) => {
+          setProgress(Math.round((current / total) * 100));
         },
         output: {
           quality: quality / 100,
@@ -112,26 +112,28 @@ export const ImageProcessor = () => {
   };
 
   return (
-    <div className="py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className="py-12 bg-gradient-to-b from-white to-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Tabs defaultValue="single" className="w-full">
           <TabsList className="grid w-full max-w-[600px] mx-auto grid-cols-4 mb-8">
-            <TabsTrigger value="single">Single Image</TabsTrigger>
-            <TabsTrigger value="bulk">Bulk Upload</TabsTrigger>
-            <TabsTrigger value="folder">Folder Upload</TabsTrigger>
-            <TabsTrigger value="url">Image URL</TabsTrigger>
+            <TabsTrigger value="single" className="text-sm sm:text-base">Single Image</TabsTrigger>
+            <TabsTrigger value="bulk" className="text-sm sm:text-base">Bulk Upload</TabsTrigger>
+            <TabsTrigger value="folder" className="text-sm sm:text-base">Folder Upload</TabsTrigger>
+            <TabsTrigger value="url" className="text-sm sm:text-base">Image URL</TabsTrigger>
           </TabsList>
 
           <TabsContent value="single" className="mt-4">
             <div className="grid md:grid-cols-2 gap-8 max-w-[1200px] mx-auto">
-              <ImageUploader
-                originalImage={originalImage}
-                isProcessing={isProcessing}
-                progress={progress}
-                onImageUpload={handleImageUpload}
-                onProcess={processImage}
-                onClear={clearImage}
-              />
+              <div className="space-y-6">
+                <ImageUploader
+                  originalImage={originalImage}
+                  isProcessing={isProcessing}
+                  progress={progress}
+                  onImageUpload={handleImageUpload}
+                  onProcess={processImage}
+                  onClear={clearImage}
+                />
+              </div>
 
               <div className="space-y-8">
                 <BackgroundOptions
@@ -154,21 +156,21 @@ export const ImageProcessor = () => {
           </TabsContent>
 
           <TabsContent value="bulk" className="mt-4">
-            <div className="text-center p-8 bg-gray-50 rounded-lg">
+            <div className="text-center p-8 bg-gray-50 rounded-lg shadow-sm">
               <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600">Bulk upload coming soon...</p>
             </div>
           </TabsContent>
 
           <TabsContent value="folder" className="mt-4">
-            <div className="text-center p-8 bg-gray-50 rounded-lg">
+            <div className="text-center p-8 bg-gray-50 rounded-lg shadow-sm">
               <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600">Folder upload coming soon...</p>
             </div>
           </TabsContent>
 
           <TabsContent value="url" className="mt-4">
-            <div className="text-center p-8 bg-gray-50 rounded-lg">
+            <div className="text-center p-8 bg-gray-50 rounded-lg shadow-sm">
               <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600">Image URL processing coming soon...</p>
             </div>
