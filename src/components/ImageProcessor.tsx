@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon, Upload, FolderOpen, Link2 } from "lucide-react";
 import { useToast } from "./ui/use-toast";
 import { removeBackground } from "@imgly/background-removal";
 import { ImageUploader } from "./image-processor/ImageUploader";
 import { BackgroundOptions } from "./image-processor/BackgroundOptions";
 import { ProcessedImage } from "./image-processor/ProcessedImage";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
 export const ImageProcessor = () => {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
@@ -16,6 +18,7 @@ export const ImageProcessor = () => {
   const [customColor, setCustomColor] = useState("#ffffff");
   const [customImageUrl, setCustomImageUrl] = useState("");
   const [quality, setQuality] = useState(100);
+  const [imageUrl, setImageUrl] = useState("");
   const { toast } = useToast();
 
   const handleImageUpload = (file: File) => {
@@ -111,15 +114,85 @@ export const ImageProcessor = () => {
     setProcessedImage(null);
   };
 
+  const handleBulkUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    toast({
+      title: "Processing multiple images",
+      description: `Started processing ${files.length} images`,
+    });
+
+    // Process each file
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      handleImageUpload(file);
+      await processImage();
+    }
+  };
+
+  const handleFolderUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    toast({
+      title: "Processing folder",
+      description: `Started processing ${files.length} images from folder`,
+    });
+
+    // Process each file in the folder
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      handleImageUpload(file);
+      await processImage();
+    }
+  };
+
+  const handleUrlProcess = async () => {
+    if (!imageUrl) {
+      toast({
+        title: "Error",
+        description: "Please enter an image URL",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "image.png", { type: blob.type });
+      handleImageUpload(file);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load image from URL",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="py-12 bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Tabs defaultValue="single" className="w-full">
           <TabsList className="grid w-full max-w-[600px] mx-auto grid-cols-4 mb-8">
-            <TabsTrigger value="single" className="text-sm sm:text-base">Single Image</TabsTrigger>
-            <TabsTrigger value="bulk" className="text-sm sm:text-base">Bulk Upload</TabsTrigger>
-            <TabsTrigger value="folder" className="text-sm sm:text-base">Folder Upload</TabsTrigger>
-            <TabsTrigger value="url" className="text-sm sm:text-base">Image URL</TabsTrigger>
+            <TabsTrigger value="single" className="text-sm sm:text-base">
+              <ImageIcon className="w-4 h-4 mr-2" />
+              Single Image
+            </TabsTrigger>
+            <TabsTrigger value="bulk" className="text-sm sm:text-base">
+              <Upload className="w-4 h-4 mr-2" />
+              Bulk Upload
+            </TabsTrigger>
+            <TabsTrigger value="folder" className="text-sm sm:text-base">
+              <FolderOpen className="w-4 h-4 mr-2" />
+              Folder Upload
+            </TabsTrigger>
+            <TabsTrigger value="url" className="text-sm sm:text-base">
+              <Link2 className="w-4 h-4 mr-2" />
+              Image URL
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="single" className="mt-4">
@@ -156,23 +229,70 @@ export const ImageProcessor = () => {
           </TabsContent>
 
           <TabsContent value="bulk" className="mt-4">
-            <div className="text-center p-8 bg-gray-50 rounded-lg shadow-sm">
-              <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Bulk upload coming soon...</p>
+            <div className="max-w-[600px] mx-auto">
+              <div className="text-center p-8 bg-white rounded-lg shadow-sm border border-gray-100">
+                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Upload multiple images for batch processing</h3>
+                <p className="text-gray-600 mb-6">Select multiple images to process them all at once</p>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleBulkUpload}
+                  className="hidden"
+                  id="bulk-upload"
+                />
+                <label htmlFor="bulk-upload">
+                  <Button asChild>
+                    <span>Select Images</span>
+                  </Button>
+                </label>
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent value="folder" className="mt-4">
-            <div className="text-center p-8 bg-gray-50 rounded-lg shadow-sm">
-              <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Folder upload coming soon...</p>
+            <div className="max-w-[600px] mx-auto">
+              <div className="text-center p-8 bg-white rounded-lg shadow-sm border border-gray-100">
+                <FolderOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Select a folder containing images to process</h3>
+                <p className="text-gray-600 mb-6">Choose a folder and we'll process all images inside</p>
+                <input
+                  type="file"
+                  webkitdirectory=""
+                  directory=""
+                  multiple
+                  onChange={handleFolderUpload}
+                  className="hidden"
+                  id="folder-upload"
+                />
+                <label htmlFor="folder-upload">
+                  <Button asChild>
+                    <span>Select Folder</span>
+                  </Button>
+                </label>
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent value="url" className="mt-4">
-            <div className="text-center p-8 bg-gray-50 rounded-lg shadow-sm">
-              <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Image URL processing coming soon...</p>
+            <div className="max-w-[600px] mx-auto">
+              <div className="p-8 bg-white rounded-lg shadow-sm border border-gray-100">
+                <h3 className="text-lg font-semibold mb-4">Process Image from URL</h3>
+                <div className="flex gap-2">
+                  <Input
+                    type="url"
+                    placeholder="Enter image URL"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleUrlProcess} className="whitespace-nowrap">
+                    <Link2 className="w-4 h-4 mr-2" />
+                    Process
+                  </Button>
+                </div>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
