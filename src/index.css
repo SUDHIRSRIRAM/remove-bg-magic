@@ -32,7 +32,25 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer components {
+  .feature-card {
+    @apply p-6 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  .stat-card {
+    @apply flex flex-col items-center justify-center p-4 bg-white rounded-lg border border-gray-100 hover:border-primary/20 transition-colors;
+  }
+
+  .testimonial-card {
+    @apply p-6 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600;
   }
 }
 
@@ -40,14 +58,19 @@
   background: linear-gradient(135deg, #2563eb11 0%, #ffffff 100%);
 }
 
-.feature-card {
-  @apply p-6 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300;
+/* Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
-.stat-card {
-  @apply flex flex-col items-center justify-center p-4;
-}
-
-.testimonial-card {
-  @apply p-6 rounded-xl bg-white border border-gray-100 shadow-sm;
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }
