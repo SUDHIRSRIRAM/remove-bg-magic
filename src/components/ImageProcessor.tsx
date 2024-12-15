@@ -7,6 +7,7 @@ import { BulkUploadTab } from "./image-processor/BulkUploadTab";
 import { FolderUploadTab } from "./image-processor/FolderUploadTab";
 import { ImageUrlTab } from "./image-processor/ImageUrlTab";
 import { TabHeader } from "./image-processor/TabHeader";
+import { ProgressHandler } from "./image-processor/ProgressHandler";
 
 export const ImageProcessor = () => {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
@@ -37,7 +38,7 @@ export const ImageProcessor = () => {
 
       const result = await removeBackground(blob, {
         progress: (p: number) => {
-          setProgress(p);
+          setProgress(Math.round(p * 100));
         },
         output: {
           quality: quality / 100,
@@ -97,15 +98,17 @@ export const ImageProcessor = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-white to-gray-50 px-4 py-8 md:py-12">
+    <div className="w-full min-h-screen bg-gradient-to-b from-white to-gray-50 px-2 sm:px-4 py-4 sm:py-8">
       <div className="max-w-7xl mx-auto">
-        <Tabs defaultValue="single" className="w-full space-y-8">
+        <Tabs defaultValue="single" className="w-full space-y-4 sm:space-y-8">
           <TabsList className="w-full max-w-3xl mx-auto bg-white/80 backdrop-blur-sm border rounded-lg p-2 sticky top-0 z-10">
             <TabHeader />
           </TabsList>
 
-          <div className="max-w-3xl mx-auto w-full">
-            <TabsContent value="single" className="mt-4 space-y-4">
+          <div className="max-w-3xl mx-auto w-full space-y-4">
+            <ProgressHandler isProcessing={isProcessing} progress={progress} />
+            
+            <TabsContent value="single" className="mt-2 sm:mt-4 space-y-4">
               <SingleImageTab
                 originalImage={originalImage}
                 processedImage={processedImage}
@@ -137,7 +140,7 @@ export const ImageProcessor = () => {
               />
             </TabsContent>
 
-            <TabsContent value="bulk" className="mt-4">
+            <TabsContent value="bulk" className="mt-2 sm:mt-4">
               <BulkUploadTab onBulkUpload={async (e) => {
                 const files = e.target.files;
                 if (!files) return;
@@ -154,7 +157,7 @@ export const ImageProcessor = () => {
               }} />
             </TabsContent>
 
-            <TabsContent value="folder" className="mt-4">
+            <TabsContent value="folder" className="mt-2 sm:mt-4">
               <FolderUploadTab onFolderUpload={async (e) => {
                 const files = e.target.files;
                 if (!files) return;
@@ -171,7 +174,7 @@ export const ImageProcessor = () => {
               }} />
             </TabsContent>
 
-            <TabsContent value="url" className="mt-4">
+            <TabsContent value="url" className="mt-2 sm:mt-4">
               <ImageUrlTab
                 imageUrl={imageUrl}
                 onImageUrlChange={setImageUrl}

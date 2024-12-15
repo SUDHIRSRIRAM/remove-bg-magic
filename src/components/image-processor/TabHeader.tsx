@@ -3,7 +3,7 @@ import { TabsTrigger } from "../ui/tabs";
 
 export const TabHeader = () => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 w-full">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
       <TabsTrigger 
         value="single" 
         className="flex items-center justify-center gap-2 p-3 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all"
