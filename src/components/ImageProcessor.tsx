@@ -3,11 +3,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Image as ImageIcon, Upload, FolderOpen, Link2 } from "lucide-react";
 import { useToast } from "./ui/use-toast";
 import { removeBackground } from "@imgly/background-removal";
-import { ImageUploader } from "./image-processor/ImageUploader";
-import { BackgroundOptions } from "./image-processor/BackgroundOptions";
-import { ProcessedImage } from "./image-processor/ProcessedImage";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import { SingleImageTab } from "./image-processor/SingleImageTab";
+import { BulkUploadTab } from "./image-processor/BulkUploadTab";
+import { FolderUploadTab } from "./image-processor/FolderUploadTab";
+import { ImageUrlTab } from "./image-processor/ImageUrlTab";
 
 export const ImageProcessor = () => {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
@@ -37,8 +36,8 @@ export const ImageProcessor = () => {
       const blob = await response.blob();
 
       const result = await removeBackground(blob, {
-        progress: (_: string, current: number, total: number) => {
-          setProgress(Math.round((current / total) * 100));
+        progress: (progress: number) => {
+          setProgress(progress);
         },
         output: {
           quality: quality / 100,
@@ -103,7 +102,7 @@ export const ImageProcessor = () => {
 
     const link = document.createElement("a");
     link.href = processedImage;
-    link.download = `processed-image-hd-${quality}.png`;
+    link.download = `processed-image-${quality}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -123,7 +122,6 @@ export const ImageProcessor = () => {
       description: `Started processing ${files.length} images`,
     });
 
-    // Process each file
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       handleImageUpload(file);
@@ -140,7 +138,6 @@ export const ImageProcessor = () => {
       description: `Started processing ${files.length} images from folder`,
     });
 
-    // Process each file in the folder
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       handleImageUpload(file);
@@ -208,104 +205,40 @@ export const ImageProcessor = () => {
           </TabsList>
 
           <TabsContent value="single" className="mt-4">
-            <div className="grid md:grid-cols-2 gap-8 max-w-[1200px] mx-auto">
-              <div className="space-y-6">
-                <ImageUploader
-                  originalImage={originalImage}
-                  isProcessing={isProcessing}
-                  progress={progress}
-                  onImageUpload={handleImageUpload}
-                  onProcess={processImage}
-                  onClear={clearImage}
-                />
-              </div>
-
-              <div className="space-y-8">
-                <BackgroundOptions
-                  selectedBackground={selectedBackground}
-                  customColor={customColor}
-                  customImageUrl={customImageUrl}
-                  onBackgroundChange={setSelectedBackground}
-                  onCustomColorChange={setCustomColor}
-                  onCustomImageUrlChange={setCustomImageUrl}
-                />
-
-                <ProcessedImage
-                  processedImage={processedImage}
-                  onDownload={downloadImage}
-                  quality={quality}
-                  onQualityChange={setQuality}
-                />
-              </div>
-            </div>
+            <SingleImageTab
+              originalImage={originalImage}
+              processedImage={processedImage}
+              isProcessing={isProcessing}
+              progress={progress}
+              selectedBackground={selectedBackground}
+              customColor={customColor}
+              customImageUrl={customImageUrl}
+              quality={quality}
+              onImageUpload={handleImageUpload}
+              onProcess={processImage}
+              onClear={clearImage}
+              onBackgroundChange={setSelectedBackground}
+              onCustomColorChange={setCustomColor}
+              onCustomImageUrlChange={setCustomImageUrl}
+              onQualityChange={setQuality}
+              onDownload={downloadImage}
+            />
           </TabsContent>
 
           <TabsContent value="bulk" className="mt-4">
-            <div className="max-w-[600px] mx-auto">
-              <div className="text-center p-8 bg-white rounded-lg shadow-sm border border-gray-100">
-                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Upload multiple images for batch processing</h3>
-                <p className="text-gray-600 mb-6">Select multiple images to process them all at once</p>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleBulkUpload}
-                  className="hidden"
-                  id="bulk-upload"
-                />
-                <label htmlFor="bulk-upload">
-                  <Button asChild>
-                    <span>Select Images</span>
-                  </Button>
-                </label>
-              </div>
-            </div>
+            <BulkUploadTab onBulkUpload={handleBulkUpload} />
           </TabsContent>
 
           <TabsContent value="folder" className="mt-4">
-            <div className="max-w-[600px] mx-auto">
-              <div className="text-center p-8 bg-white rounded-lg shadow-sm border border-gray-100">
-                <FolderOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Select a folder containing images to process</h3>
-                <p className="text-gray-600 mb-6">Choose a folder and we'll process all images inside</p>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleFolderUpload}
-                  className="hidden"
-                  id="folder-upload"
-                  {...{ directory: "", webkitdirectory: "" } as any}
-                />
-                <label htmlFor="folder-upload">
-                  <Button asChild>
-                    <span>Select Folder</span>
-                  </Button>
-                </label>
-              </div>
-            </div>
+            <FolderUploadTab onFolderUpload={handleFolderUpload} />
           </TabsContent>
 
           <TabsContent value="url" className="mt-4">
-            <div className="max-w-[600px] mx-auto">
-              <div className="p-8 bg-white rounded-lg shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold mb-4">Process Image from URL</h3>
-                <div className="flex gap-2">
-                  <Input
-                    type="url"
-                    placeholder="Enter image URL"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button onClick={handleUrlProcess} className="whitespace-nowrap">
-                    <Link2 className="w-4 h-4 mr-2" />
-                    Process
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <ImageUrlTab
+              imageUrl={imageUrl}
+              onImageUrlChange={setImageUrl}
+              onUrlProcess={handleUrlProcess}
+            />
           </TabsContent>
         </Tabs>
       </div>

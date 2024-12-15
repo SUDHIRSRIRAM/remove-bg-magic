@@ -92,4 +92,25 @@
   .image-uploader {
     @apply p-4;
   }
+
+  .tabs-list {
+    @apply flex-wrap;
+  }
+
+  .tab-trigger {
+    @apply text-sm py-2;
+  }
+}
+
+/* Modern UI Enhancements */
+.hover-card {
+  @apply transition-all duration-300 hover:shadow-lg hover:border-primary/30;
+}
+
+.glass-effect {
+  @apply bg-white/80 backdrop-blur-sm;
+}
+
+.button-gradient {
+  @apply bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90;
 }
