@@ -10,10 +10,10 @@ interface ImageUrlTabProps {
 
 export const ImageUrlTab = ({ imageUrl, onImageUrlChange, onUrlProcess }: ImageUrlTabProps) => {
   return (
-    <div className="max-w-[600px] mx-auto">
-      <div className="p-8 bg-white rounded-lg shadow-sm border border-gray-100 hover:border-primary/20 transition-all duration-300">
+    <div className="w-full">
+      <div className="p-6 md:p-8 bg-white rounded-lg shadow-sm border border-gray-100 hover:border-primary/20 transition-all duration-300">
         <h3 className="text-lg font-semibold mb-4">Process Image from URL</h3>
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Input
             type="url"
             placeholder="Enter image URL"
@@ -21,9 +21,12 @@ export const ImageUrlTab = ({ imageUrl, onImageUrlChange, onUrlProcess }: ImageU
             onChange={(e) => onImageUrlChange(e.target.value)}
             className="flex-1"
           />
-          <Button onClick={onUrlProcess} className="whitespace-nowrap">
+          <Button 
+            onClick={onUrlProcess} 
+            className="whitespace-nowrap"
+          >
             <Link2 className="w-4 h-4 mr-2" />
-            Process
+            Process URL
           </Button>
         </div>
       </div>
