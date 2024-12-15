@@ -3,38 +3,34 @@ import { TabsTrigger } from "../ui/tabs";
 
 export const TabHeader = () => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full">
+    <div className="grid grid-cols-2 gap-2 w-full">
       <TabsTrigger 
         value="single" 
-        className="flex items-center justify-center gap-2 p-3 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all"
+        className="flex items-center justify-center gap-2 py-3 px-4 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all hover:bg-gray-50"
       >
         <ImageIcon className="w-4 h-4" />
-        <span className="hidden sm:inline">Single Image</span>
-        <span className="sm:hidden">Single</span>
+        <span className="text-sm font-medium">Single</span>
       </TabsTrigger>
       <TabsTrigger 
         value="bulk" 
-        className="flex items-center justify-center gap-2 p-3 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all"
+        className="flex items-center justify-center gap-2 py-3 px-4 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all hover:bg-gray-50"
       >
         <Upload className="w-4 h-4" />
-        <span className="hidden sm:inline">Bulk Upload</span>
-        <span className="sm:hidden">Bulk</span>
+        <span className="text-sm font-medium">Bulk</span>
       </TabsTrigger>
       <TabsTrigger 
         value="folder" 
-        className="flex items-center justify-center gap-2 p-3 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all"
+        className="flex items-center justify-center gap-2 py-3 px-4 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all hover:bg-gray-50"
       >
         <FolderOpen className="w-4 h-4" />
-        <span className="hidden sm:inline">Folder Upload</span>
-        <span className="sm:hidden">Folder</span>
+        <span className="text-sm font-medium">Folder</span>
       </TabsTrigger>
       <TabsTrigger 
         value="url" 
-        className="flex items-center justify-center gap-2 p-3 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all"
+        className="flex items-center justify-center gap-2 py-3 px-4 data-[state=active]:bg-primary data-[state=active]:text-white rounded-md transition-all hover:bg-gray-50"
       >
         <Link2 className="w-4 h-4" />
-        <span className="hidden sm:inline">Image URL</span>
-        <span className="sm:hidden">URL</span>
+        <span className="text-sm font-medium">URL</span>
       </TabsTrigger>
     </div>
   );

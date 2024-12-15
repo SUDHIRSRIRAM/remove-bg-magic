@@ -37,8 +37,8 @@ export const ImageProcessor = () => {
       const blob = await response.blob();
 
       const result = await removeBackground(blob, {
-        progress: (p: number) => {
-          setProgress(Math.round(p * 100));
+        progress: (progress: number) => {
+          setProgress(Math.round(progress * 100));
         },
         output: {
           quality: quality / 100,
@@ -98,17 +98,17 @@ export const ImageProcessor = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-b from-white to-gray-50 px-2 sm:px-4 py-4 sm:py-8">
+    <div className="w-full min-h-screen bg-gradient-to-b from-white to-gray-50 px-2 sm:px-4 py-4">
       <div className="max-w-7xl mx-auto">
-        <Tabs defaultValue="single" className="w-full space-y-4 sm:space-y-8">
-          <TabsList className="w-full max-w-3xl mx-auto bg-white/80 backdrop-blur-sm border rounded-lg p-2 sticky top-0 z-10">
+        <Tabs defaultValue="single" className="w-full space-y-4">
+          <TabsList className="w-full max-w-3xl mx-auto bg-white shadow-sm border rounded-lg p-2 sticky top-0 z-10">
             <TabHeader />
           </TabsList>
 
           <div className="max-w-3xl mx-auto w-full space-y-4">
             <ProgressHandler isProcessing={isProcessing} progress={progress} />
             
-            <TabsContent value="single" className="mt-2 sm:mt-4 space-y-4">
+            <TabsContent value="single" className="mt-2 space-y-4">
               <SingleImageTab
                 originalImage={originalImage}
                 processedImage={processedImage}
@@ -140,7 +140,7 @@ export const ImageProcessor = () => {
               />
             </TabsContent>
 
-            <TabsContent value="bulk" className="mt-2 sm:mt-4">
+            <TabsContent value="bulk" className="mt-2">
               <BulkUploadTab onBulkUpload={async (e) => {
                 const files = e.target.files;
                 if (!files) return;
@@ -157,7 +157,7 @@ export const ImageProcessor = () => {
               }} />
             </TabsContent>
 
-            <TabsContent value="folder" className="mt-2 sm:mt-4">
+            <TabsContent value="folder" className="mt-2">
               <FolderUploadTab onFolderUpload={async (e) => {
                 const files = e.target.files;
                 if (!files) return;
@@ -174,7 +174,7 @@ export const ImageProcessor = () => {
               }} />
             </TabsContent>
 
-            <TabsContent value="url" className="mt-2 sm:mt-4">
+            <TabsContent value="url" className="mt-2">
               <ImageUrlTab
                 imageUrl={imageUrl}
                 onImageUrlChange={setImageUrl}
