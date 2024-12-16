@@ -41,8 +41,8 @@ export const SingleImageTab = ({
   onDownload,
 }: SingleImageTabProps) => {
   return (
-    <div className="grid md:grid-cols-2 gap-4 md:gap-8 p-2 sm:p-4">
-      <div className="space-y-4">
+    <div className="grid md:grid-cols-2 gap-8 max-w-[1200px] mx-auto">
+      <div className="space-y-6">
         <ImageUploader
           originalImage={originalImage}
           isProcessing={isProcessing}
@@ -53,7 +53,7 @@ export const SingleImageTab = ({
         />
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         <BackgroundOptions
           selectedBackground={selectedBackground}
           customColor={customColor}
