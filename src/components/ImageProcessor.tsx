@@ -26,10 +26,10 @@ export const ImageProcessor = () => {
       const blob = await response.blob();
 
       const result = await removeBackground(blob, {
-        progress: (progress: number) => {
-          setProgress(Math.round(progress * 100));
+        progress: (p: number) => {
+          setProgress(Math.round(p * 100));
         },
-        model: "medium"
+        model: "isnet"
       });
 
       setProcessedImage(URL.createObjectURL(result));
