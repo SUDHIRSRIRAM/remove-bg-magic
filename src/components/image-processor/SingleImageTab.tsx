@@ -1,6 +1,5 @@
 import { ImageIcon } from "lucide-react";
 import { ImageUploader } from "./ImageUploader";
-import { BackgroundOptions } from "./BackgroundOptions";
 import { ProcessedImage } from "./ProcessedImage";
 
 interface SingleImageTabProps {
@@ -8,16 +7,10 @@ interface SingleImageTabProps {
   processedImage: string | null;
   isProcessing: boolean;
   progress: number;
-  selectedBackground: string;
-  customColor: string;
-  customImageUrl: string;
   quality: number;
   onImageUpload: (file: File) => void;
   onProcess: () => void;
   onClear: () => void;
-  onBackgroundChange: (type: string) => void;
-  onCustomColorChange: (color: string) => void;
-  onCustomImageUrlChange: (url: string) => void;
   onQualityChange: (value: number) => void;
   onDownload: () => void;
 }
@@ -27,16 +20,10 @@ export const SingleImageTab = ({
   processedImage,
   isProcessing,
   progress,
-  selectedBackground,
-  customColor,
-  customImageUrl,
   quality,
   onImageUpload,
   onProcess,
   onClear,
-  onBackgroundChange,
-  onCustomColorChange,
-  onCustomImageUrlChange,
   onQualityChange,
   onDownload,
 }: SingleImageTabProps) => {
@@ -54,15 +41,6 @@ export const SingleImageTab = ({
       </div>
 
       <div className="space-y-6">
-        <BackgroundOptions
-          selectedBackground={selectedBackground}
-          customColor={customColor}
-          customImageUrl={customImageUrl}
-          onBackgroundChange={onBackgroundChange}
-          onCustomColorChange={onCustomColorChange}
-          onCustomImageUrlChange={onCustomImageUrlChange}
-        />
-
         <ProcessedImage
           processedImage={processedImage}
           onDownload={onDownload}

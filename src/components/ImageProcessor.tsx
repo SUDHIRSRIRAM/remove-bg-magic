@@ -14,9 +14,6 @@ export const ImageProcessor = () => {
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [selectedBackground, setSelectedBackground] = useState<string>("transparent");
-  const [customColor, setCustomColor] = useState("#ffffff");
-  const [customImageUrl, setCustomImageUrl] = useState("");
   const [quality, setQuality] = useState(100);
   const [imageUrl, setImageUrl] = useState("");
   const { toast } = useToast();
@@ -46,39 +43,7 @@ export const ImageProcessor = () => {
         }
       });
 
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const img = new Image();
-
-      img.onload = () => {
-        if (!canvas || !ctx) return;
-        canvas.width = img.width;
-        canvas.height = img.height;
-
-        if (selectedBackground !== "transparent") {
-          if (selectedBackground === "custom") {
-            ctx.fillStyle = customColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-          } else if (selectedBackground === "image" && customImageUrl) {
-            const bgImg = new Image();
-            bgImg.onload = () => {
-              ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
-              ctx.drawImage(img, 0, 0);
-              setProcessedImage(canvas.toDataURL('image/png', quality / 100));
-            };
-            bgImg.src = customImageUrl;
-            return;
-          } else {
-            ctx.fillStyle = selectedBackground;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-          }
-        }
-        
-        ctx.drawImage(img, 0, 0);
-        setProcessedImage(canvas.toDataURL('image/png', quality / 100));
-      };
-
-      img.src = URL.createObjectURL(result);
+      setProcessedImage(URL.createObjectURL(result));
 
       toast({
         title: "Success!",
@@ -114,9 +79,6 @@ export const ImageProcessor = () => {
                 processedImage={processedImage}
                 isProcessing={isProcessing}
                 progress={progress}
-                selectedBackground={selectedBackground}
-                customColor={customColor}
-                customImageUrl={customImageUrl}
                 quality={quality}
                 onImageUpload={handleImageUpload}
                 onProcess={processImage}
@@ -124,9 +86,6 @@ export const ImageProcessor = () => {
                   setOriginalImage(null);
                   setProcessedImage(null);
                 }}
-                onBackgroundChange={setSelectedBackground}
-                onCustomColorChange={setCustomColor}
-                onCustomImageUrlChange={setCustomImageUrl}
                 onQualityChange={setQuality}
                 onDownload={() => {
                   if (!processedImage) return;
