@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { SEO } from "./components/SEO";
+import { PerformanceMonitor } from "./components/PerformanceMonitor";
 import Index from "./pages/Index";
 import Features from "./pages/Features";
 import HowItWorks from "./pages/HowItWorks";
@@ -19,6 +20,8 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000,
+      retry: 1,
+      networkMode: 'online',
     },
   },
 });
@@ -45,6 +48,7 @@ const App = () => {
         <BrowserRouter>
           <AnalyticsWrapper>
             <SEO />
+            <PerformanceMonitor />
             <div className="min-h-screen flex flex-col">
               <Header />
               <main className="flex-grow pt-16">
