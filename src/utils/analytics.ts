@@ -2,12 +2,13 @@ import ReactGA from 'react-ga4';
 
 const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'; // Replace with your actual GA4 measurement ID
 
-// Initialize GA4 with better error handling
 export const initGA = () => {
   try {
     ReactGA.initialize(GA_MEASUREMENT_ID, {
       testMode: process.env.NODE_ENV !== 'production',
-      debug: process.env.NODE_ENV !== 'production',
+      gaOptions: {
+        debug_mode: process.env.NODE_ENV !== 'production'
+      }
     });
     console.log('Google Analytics initialized successfully');
   } catch (error) {
@@ -15,7 +16,6 @@ export const initGA = () => {
   }
 };
 
-// Track page views with error handling
 export const trackPageView = (path: string) => {
   try {
     ReactGA.send({ 
@@ -29,7 +29,6 @@ export const trackPageView = (path: string) => {
   }
 };
 
-// Enhanced event tracking with more parameters
 export const trackEvent = (
   category: string,
   action: string,
@@ -51,7 +50,6 @@ export const trackEvent = (
   }
 };
 
-// Track user timing
 export const trackTiming = (
   category: string,
   variable: string,
@@ -59,24 +57,15 @@ export const trackTiming = (
   label?: string
 ) => {
   try {
-    ReactGA.timing({
-      category,
-      variable,
-      value,
-      label
-    });
+    trackEvent('Timing', `${category} - ${variable}`, label, value);
   } catch (error) {
     console.error('Failed to track timing:', error);
   }
 };
 
-// Track exceptions
 export const trackException = (description: string, fatal: boolean = false) => {
   try {
-    ReactGA.exception({
-      description,
-      fatal
-    });
+    trackEvent('Exception', description, fatal ? 'Fatal' : 'Non-Fatal');
   } catch (error) {
     console.error('Failed to track exception:', error);
   }

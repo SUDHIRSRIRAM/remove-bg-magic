@@ -114,3 +114,34 @@
 .button-gradient {
   @apply bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90;
 }
+
+/* Optimize scrolling performance */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  perspective: 1000;
+}
+
+/* Optimize animations */
+* {
+  animation-duration: 0.1s;
+  animation-timing-function: ease-out;
+  will-change: transform, opacity;
+}
+
+/* Optimize images */
+img {
+  content-visibility: auto;
+  contain: content;
+}
+
+/* Optimize layout shifts */
+main {
+  contain: layout style paint;
+}

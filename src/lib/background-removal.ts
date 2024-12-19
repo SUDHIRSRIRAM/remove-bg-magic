@@ -1,10 +1,11 @@
 import { pipeline, env } from '@huggingface/transformers';
 
-// Configure transformers.js to always download models
-env.allowLocalModels = false;
-env.useBrowserCache = false;
+// Configure transformers.js to use browser cache and optimize for performance
+env.allowLocalModels = true;
+env.useBrowserCache = true;
+env.backends.onnx.wasm.numThreads = 4;
 
-const MAX_IMAGE_DIMENSION = 1024;
+const MAX_IMAGE_DIMENSION = 512; // Reduced for better performance
 
 function resizeImageIfNeeded(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, image: HTMLImageElement) {
   let width = image.naturalWidth;
@@ -31,15 +32,26 @@ function resizeImageIfNeeded(canvas: HTMLCanvasElement, ctx: CanvasRenderingCont
   return false;
 }
 
+// Cache for the segmentation model
+let segmenterInstance: any = null;
+
 export const removeBackground = async (imageElement: HTMLImageElement): Promise<Blob> => {
   try {
     console.log('Starting background removal process...');
-    const segmenter = await pipeline('image-segmentation', 'Xenova/segformer-b0-finetuned-ade-512-512',{
-      device: 'webgpu',
-    });
+    
+    // Reuse existing segmenter instance if available
+    if (!segmenterInstance) {
+      segmenterInstance = await pipeline('image-segmentation', 'Xenova/segformer-b0-finetuned-ade-512-512', {
+        device: 'webgpu',
+        quantized: true, // Use quantized model for better performance
+      });
+    }
     
     const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', {
+      willReadFrequently: true,
+      alpha: true
+    });
     
     if (!ctx) throw new Error('Could not get canvas context');
     
@@ -49,9 +61,7 @@ export const removeBackground = async (imageElement: HTMLImageElement): Promise<
     const imageData = canvas.toDataURL('image/jpeg', 0.8);
     console.log('Image converted to base64');
     
-    const result = await segmenter(imageData);
-    
-    console.log('Segmentation result:', result);
+    const result = await segmenterInstance(imageData);
     
     if (!result || !Array.isArray(result) || result.length === 0 || !result[0].mask) {
       throw new Error('Invalid segmentation result');
@@ -60,26 +70,27 @@ export const removeBackground = async (imageElement: HTMLImageElement): Promise<
     const outputCanvas = document.createElement('canvas');
     outputCanvas.width = canvas.width;
     outputCanvas.height = canvas.height;
-    const outputCtx = outputCanvas.getContext('2d');
+    const outputCtx = outputCanvas.getContext('2d', {
+      willReadFrequently: true,
+      alpha: true
+    });
     
     if (!outputCtx) throw new Error('Could not get output canvas context');
     
     outputCtx.drawImage(canvas, 0, 0);
     
-    const outputImageData = outputCtx.getImageData(
-      0, 0,
-      outputCanvas.width,
-      outputCanvas.height
-    );
+    const outputImageData = outputCtx.getImageData(0, 0, outputCanvas.width, outputCanvas.height);
     const data = outputImageData.data;
     
-    for (let i = 0; i < result[0].mask.data.length; i++) {
-      const alpha = Math.round((1 - result[0].mask.data[i]) * 255);
-      data[i * 4 + 3] = alpha;
+    // Use Uint8Array for better performance
+    const maskData = new Uint8Array(result[0].mask.data);
+    
+    // Optimize the loop for better performance
+    for (let i = 0; i < maskData.length; i++) {
+      data[i * 4 + 3] = Math.round((1 - maskData[i]) * 255);
     }
     
     outputCtx.putImageData(outputImageData, 0, 0);
-    console.log('Mask applied successfully');
     
     return new Promise((resolve, reject) => {
       outputCanvas.toBlob(
@@ -92,7 +103,7 @@ export const removeBackground = async (imageElement: HTMLImageElement): Promise<
           }
         },
         'image/png',
-        1.0
+        0.9 // Slightly reduced quality for better performance
       );
     });
   } catch (error) {

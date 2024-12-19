@@ -11,13 +11,13 @@ export const PerformanceMonitor = () => {
           trackTiming(
             'Page Load',
             'DOM Complete',
-            Math.round(navigation.domComplete),
+            Math.round(navigation.domComplete)
           );
           
           trackTiming(
             'Page Load',
             'First Contentful Paint',
-            Math.round(navigation.responseStart),
+            Math.round(navigation.responseStart)
           );
         }
 
@@ -37,16 +37,21 @@ export const PerformanceMonitor = () => {
 
         observer.observe({ entryTypes: ['longtask'] });
 
-        // Monitor memory usage
-        if (performance.memory) {
-          setInterval(() => {
-            trackTiming(
-              'Memory',
-              'Heap Size',
-              Math.round(performance.memory.usedJSHeapSize / 1048576), // Convert to MB
-            );
-          }, 60000); // Check every minute
-        }
+        // Monitor frame rate
+        let lastTime = performance.now();
+        let frames = 0;
+        const measureFrameRate = () => {
+          frames++;
+          const currentTime = performance.now();
+          if (currentTime - lastTime > 1000) {
+            const fps = Math.round((frames * 1000) / (currentTime - lastTime));
+            trackTiming('Performance', 'FPS', fps);
+            frames = 0;
+            lastTime = currentTime;
+          }
+          requestAnimationFrame(measureFrameRate);
+        };
+        requestAnimationFrame(measureFrameRate);
       }
     } catch (error) {
       trackException(`Performance monitoring error: ${error}`);
