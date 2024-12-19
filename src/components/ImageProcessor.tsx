@@ -2,18 +2,16 @@ import { useState } from "react";
 import { useToast } from "./ui/use-toast";
 import { removeBackground } from "@imgly/background-removal";
 import { SingleImageTab } from "./image-processor/SingleImageTab";
-import { Trash2, Upload, Download, Crop, Eraser, PaintBucket, Brush } from "lucide-react";
+import { Trash2, Upload, Download } from "lucide-react";
 import { Button } from "./ui/button";
 import { Progress } from "./ui/progress";
-import { Slider } from "./ui/slider";
+import { ImageEditor } from "./image-processor/ImageEditor";
 
 export const ImageProcessor = () => {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [brightness, setBrightness] = useState(100);
-  const [contrast, setContrast] = useState(100);
   const { toast } = useToast();
 
   const handleImageUpload = (file: File) => {
@@ -105,22 +103,12 @@ export const ImageProcessor = () => {
     });
   };
 
-  const handleBrightnessChange = (value: number) => {
-    setBrightness(value);
-    if (!processedImage) return;
-    const img = document.querySelector('.processed-image') as HTMLImageElement;
-    if (img) {
-      img.style.filter = `brightness(${value}%) contrast(${contrast}%)`;
-    }
-  };
-
-  const handleContrastChange = (value: number) => {
-    setContrast(value);
-    if (!processedImage) return;
-    const img = document.querySelector('.processed-image') as HTMLImageElement;
-    if (img) {
-      img.style.filter = `brightness(${brightness}%) contrast(${value}%)`;
-    }
+  const handleImageUpdate = (newImage: string) => {
+    setProcessedImage(newImage);
+    toast({
+      title: "Image Updated",
+      description: "Changes have been applied successfully",
+    });
   };
 
   return (
@@ -207,47 +195,10 @@ export const ImageProcessor = () => {
           <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center min-h-[400px] flex flex-col items-center justify-center">
             {processedImage ? (
               <div className="space-y-4 w-full">
-                <img
-                  src={processedImage}
-                  alt="Processed"
-                  className="processed-image max-h-[400px] mx-auto rounded-lg object-contain"
+                <ImageEditor 
+                  processedImage={processedImage}
+                  onImageUpdate={handleImageUpdate}
                 />
-                <div className="flex flex-wrap gap-2 justify-center mt-4">
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <Crop className="w-4 h-4" /> Crop
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <Eraser className="w-4 h-4" /> Erase
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <PaintBucket className="w-4 h-4" /> Fill
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <Brush className="w-4 h-4" /> Brush
-                  </Button>
-                </div>
-                <div className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <label className="text-sm text-gray-600">Brightness</label>
-                    <Slider
-                      value={[brightness]}
-                      onValueChange={([value]) => handleBrightnessChange(value)}
-                      min={0}
-                      max={200}
-                      step={1}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm text-gray-600">Contrast</label>
-                    <Slider
-                      value={[contrast]}
-                      onValueChange={([value]) => handleContrastChange(value)}
-                      min={0}
-                      max={200}
-                      step={1}
-                    />
-                  </div>
-                </div>
                 <Button
                   onClick={handleDownload}
                   className="w-full bg-green-500 hover:bg-green-600 text-white mt-4"
