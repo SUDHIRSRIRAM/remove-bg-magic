@@ -1,15 +1,15 @@
-import { useState, useRef, useEffect } from "react";
-import { Brush } from "lucide-react";
+import { useState, useRef, useEffect } from 'react';
 import { Button } from "../../ui/button";
+import { Eraser } from "lucide-react";
 import { Slider } from "../../ui/slider";
 
-interface MagicBrushProps {
+interface EraseToolProps {
   imageRef: HTMLImageElement | null;
-  onImageUpdate: (newImageData: string) => void;
+  onImageUpdate: (newImage: string) => void;
 }
 
-export const MagicBrush = ({ imageRef, onImageUpdate }: MagicBrushProps) => {
-  const [isActive, setIsActive] = useState(false);
+export const EraseTool = ({ imageRef, onImageUpdate }: EraseToolProps) => {
+  const [isErasing, setIsErasing] = useState(false);
   const [brushSize, setBrushSize] = useState(20);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -30,11 +30,10 @@ export const MagicBrush = ({ imageRef, onImageUpdate }: MagicBrushProps) => {
     context.globalCompositeOperation = 'destination-out';
     contextRef.current = context;
 
-    // Draw the initial image
     context.drawImage(imageRef, 0, 0);
   }, [imageRef]);
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const startErasing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!contextRef.current) return;
 
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -49,7 +48,7 @@ export const MagicBrush = ({ imageRef, onImageUpdate }: MagicBrushProps) => {
     contextRef.current.lineWidth = brushSize;
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const erase = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing.current || !contextRef.current || !canvasRef.current) return;
 
     const rect = canvasRef.current.getBoundingClientRect();
@@ -60,29 +59,28 @@ export const MagicBrush = ({ imageRef, onImageUpdate }: MagicBrushProps) => {
     contextRef.current.stroke();
   };
 
-  const stopDrawing = () => {
+  const stopErasing = () => {
     if (!isDrawing.current || !contextRef.current || !canvasRef.current) return;
 
     contextRef.current.closePath();
     isDrawing.current = false;
 
-    // Update the image with the new canvas data
     const newImageData = canvasRef.current.toDataURL('image/png');
     onImageUpdate(newImageData);
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <Button 
-        variant={isActive ? "default" : "outline"} 
+        variant="outline" 
         size="sm" 
         className="flex items-center gap-2"
-        onClick={() => setIsActive(!isActive)}
+        onClick={() => setIsErasing(!isErasing)}
       >
-        <Brush className="w-4 h-4" /> Magic Brush
+        <Eraser className="w-4 h-4" /> Erase
       </Button>
 
-      {isActive && (
+      {isErasing && (
         <div className="space-y-2">
           <label className="text-sm text-gray-600">Brush Size: {brushSize}px</label>
           <Slider
@@ -94,10 +92,10 @@ export const MagicBrush = ({ imageRef, onImageUpdate }: MagicBrushProps) => {
           />
           <canvas
             ref={canvasRef}
-            onMouseDown={startDrawing}
-            onMouseMove={draw}
-            onMouseUp={stopDrawing}
-            onMouseLeave={stopDrawing}
+            onMouseDown={startErasing}
+            onMouseMove={erase}
+            onMouseUp={stopErasing}
+            onMouseLeave={stopErasing}
             className="border border-gray-200 rounded cursor-crosshair"
             style={{ maxWidth: '100%', height: 'auto' }}
           />
