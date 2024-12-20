@@ -43,7 +43,8 @@ export const removeBackground = async (imageElement: HTMLImageElement): Promise<
     if (!segmenterInstance) {
       segmenterInstance = await pipeline('image-segmentation', 'Xenova/segformer-b0-finetuned-ade-512-512', {
         device: 'webgpu',
-        quantized: true, // Use quantized model for better performance
+        optimize: true,
+        revision: 'main'
       });
     }
     
