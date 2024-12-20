@@ -1,8 +1,7 @@
 import { useState, useRef } from "react";
+import { Crop, Eraser, PaintBucket } from "lucide-react";
+import { Button } from "../ui/button";
 import { Slider } from "../ui/slider";
-import { CropTool } from "./tools/CropTool";
-import { EraseTool } from "./tools/EraseTool";
-import { FillTool } from "./tools/FillTool";
 import { MagicBrush } from "./tools/MagicBrush";
 
 interface ImageEditorProps {
@@ -33,18 +32,23 @@ export const ImageEditor = ({ processedImage, onImageUpdate }: ImageEditorProps)
         ref={imageRef}
         src={processedImage}
         alt="Processed"
-        className="processed-image max-h-[400px] mx-auto rounded-lg object-contain bg-transparent"
-        style={{ 
-          filter: `brightness(${brightness}%) contrast(${contrast}%)`,
-          backgroundColor: 'transparent'
-        }}
+        className="processed-image max-h-[400px] mx-auto rounded-lg object-contain"
       />
       
       <div className="flex flex-wrap gap-2 justify-center mt-4">
-        <CropTool imageRef={imageRef.current} onImageUpdate={onImageUpdate} />
-        <EraseTool imageRef={imageRef.current} onImageUpdate={onImageUpdate} />
-        <FillTool imageRef={imageRef.current} onImageUpdate={onImageUpdate} />
-        <MagicBrush imageRef={imageRef.current} onImageUpdate={onImageUpdate} />
+        <Button variant="outline" size="sm" className="flex items-center gap-2">
+          <Crop className="w-4 h-4" /> Crop
+        </Button>
+        <Button variant="outline" size="sm" className="flex items-center gap-2">
+          <Eraser className="w-4 h-4" /> Erase
+        </Button>
+        <Button variant="outline" size="sm" className="flex items-center gap-2">
+          <PaintBucket className="w-4 h-4" /> Fill
+        </Button>
+        <MagicBrush 
+          imageRef={imageRef.current} 
+          onImageUpdate={onImageUpdate}
+        />
       </div>
 
       <div className="space-y-4 mt-4">

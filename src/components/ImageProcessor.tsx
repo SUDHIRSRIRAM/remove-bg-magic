@@ -68,33 +68,14 @@ export const ImageProcessor = () => {
         progress: (args_0: string, args_1: number) => {
           setProgress(Math.round(args_1 * 100));
         },
-        model: "isnet",
-        output: {
-          format: 'image/png',
-          quality: 1.0,
-        }
+        model: "isnet"
       });
 
-      const processedImageUrl = URL.createObjectURL(result);
-      
-      // Pre-load the image to ensure it's valid
-      const img = new Image();
-      img.onload = () => {
-        setProcessedImage(processedImageUrl);
-        toast({
-          title: "Success!",
-          description: "Background removed successfully",
-        });
-      };
-      img.onerror = () => {
-        toast({
-          title: "Error",
-          description: "Failed to process image",
-          variant: "destructive",
-        });
-      };
-      img.src = processedImageUrl;
-      
+      setProcessedImage(URL.createObjectURL(result));
+      toast({
+        title: "Success!",
+        description: "Background removed successfully",
+      });
     } catch (error) {
       console.error('Error processing image:', error);
       toast({
@@ -211,7 +192,7 @@ export const ImageProcessor = () => {
 
         {/* Result Section */}
         <div className="space-y-4">
-          <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center min-h-[400px] flex flex-col items-center justify-center bg-[url('/placeholder.svg')] bg-center bg-cover">
+          <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center min-h-[400px] flex flex-col items-center justify-center">
             {processedImage ? (
               <div className="space-y-4 w-full">
                 <ImageEditor 

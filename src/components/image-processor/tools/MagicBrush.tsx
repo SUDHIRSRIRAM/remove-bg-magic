@@ -22,7 +22,7 @@ export const MagicBrush = ({ imageRef, onImageUpdate }: MagicBrushProps) => {
     canvas.width = imageRef.width;
     canvas.height = imageRef.height;
 
-    const context = canvas.getContext('2d', { willReadFrequently: true });
+    const context = canvas.getContext('2d');
     if (!context) return;
 
     context.lineCap = 'round';
