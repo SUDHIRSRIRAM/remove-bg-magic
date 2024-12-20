@@ -42,8 +42,6 @@ export const removeBackground = async (imageElement: HTMLImageElement): Promise<
     // Reuse existing segmenter instance if available
     if (!segmenterInstance) {
       segmenterInstance = await pipeline('image-segmentation', 'Xenova/segformer-b0-finetuned-ade-512-512', {
-        device: 'webgpu',
-        optimize: true,
         revision: 'main'
       });
     }
