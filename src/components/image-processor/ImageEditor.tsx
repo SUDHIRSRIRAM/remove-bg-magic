@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Slider } from "../ui/slider";
 import { CropTool } from "./tools/CropTool";
 import { EraseTool } from "./tools/EraseTool";
@@ -33,7 +33,11 @@ export const ImageEditor = ({ processedImage, onImageUpdate }: ImageEditorProps)
         ref={imageRef}
         src={processedImage}
         alt="Processed"
-        className="processed-image max-h-[400px] mx-auto rounded-lg object-contain"
+        className="processed-image max-h-[400px] mx-auto rounded-lg object-contain bg-transparent"
+        style={{ 
+          filter: `brightness(${brightness}%) contrast(${contrast}%)`,
+          backgroundColor: 'transparent'
+        }}
       />
       
       <div className="flex flex-wrap gap-2 justify-center mt-4">
