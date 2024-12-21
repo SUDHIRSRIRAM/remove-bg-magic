@@ -20,18 +20,15 @@ export const CropTool = ({ imageRef, onImageUpdate }: CropToolProps) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const scaleX = imageRef.naturalWidth / imageRef.width;
-    const scaleY = imageRef.naturalHeight / imageRef.height;
-
     canvas.width = crop.width;
     canvas.height = crop.height;
 
     ctx.drawImage(
       imageRef,
-      crop.x * scaleX,
-      crop.y * scaleY,
-      crop.width * scaleX,
-      crop.height * scaleY,
+      crop.x,
+      crop.y,
+      crop.width,
+      crop.height,
       0,
       0,
       crop.width,
@@ -43,24 +40,29 @@ export const CropTool = ({ imageRef, onImageUpdate }: CropToolProps) => {
   };
 
   return (
-    <div>
+    <div className="w-full">
       <Button
         variant={isActive ? "default" : "outline"}
         size="sm"
         onClick={() => setIsActive(!isActive)}
-        className="flex items-center gap-2"
+        className="w-full flex items-center justify-center gap-2"
       >
-        <Crop className="w-4 h-4" /> Crop
+        <Crop className="w-4 h-4" />
+        <span>Crop</span>
       </Button>
 
       {isActive && imageRef && (
-        <ReactCrop
-          crop={crop}
-          onChange={c => setCrop(c)}
-          onComplete={handleCropComplete}
-        >
-          <img src={imageRef.src} alt="Crop preview" />
-        </ReactCrop>
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-4 max-w-[90vw] max-h-[90vh] overflow-auto">
+            <ReactCrop
+              crop={crop}
+              onChange={c => setCrop(c)}
+              onComplete={handleCropComplete}
+            >
+              <img src={imageRef.src} alt="Crop preview" />
+            </ReactCrop>
+          </div>
+        </div>
       )}
     </div>
   );

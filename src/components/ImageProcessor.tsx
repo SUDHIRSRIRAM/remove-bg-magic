@@ -113,32 +113,32 @@ export const ImageProcessor = () => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-8 space-y-8 bg-gradient-to-b from-white to-gray-50">
+    <div className="w-full max-w-6xl mx-auto px-4 py-8 space-y-8">
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-gray-900 gradient-text">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 gradient-text">
           Image Background Remover
         </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
           Upload your image and we'll remove the background instantly
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-4 sm:gap-8">
         {/* Upload Section */}
         <div className="space-y-4">
           <div
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
-            className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center transition-all duration-300 hover:border-primary/50"
+            className="border-2 border-dashed border-gray-200 rounded-lg p-4 sm:p-8 text-center transition-all duration-300 hover:border-primary/50"
           >
             {originalImage ? (
               <div className="space-y-4">
                 <img
                   src={originalImage}
                   alt="Original"
-                  className="max-h-[400px] mx-auto rounded-lg object-contain"
+                  className="max-h-[300px] sm:max-h-[400px] mx-auto rounded-lg object-contain"
                 />
-                <div className="flex gap-2 justify-center">
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
                   <Button
                     onClick={processImage}
                     disabled={isProcessing}
@@ -156,9 +156,10 @@ export const ImageProcessor = () => {
                   <Button
                     variant="destructive"
                     onClick={handleDelete}
-                    className="px-3"
+                    className="w-full sm:w-auto"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Delete</span>
                   </Button>
                 </div>
               </div>
@@ -176,9 +177,9 @@ export const ImageProcessor = () => {
                 />
                 <label
                   htmlFor="image-upload"
-                  className="cursor-pointer block p-8"
+                  className="cursor-pointer block p-4 sm:p-8"
                 >
-                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <Upload className="w-8 sm:w-12 h-8 sm:h-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 mb-2">
                     Drag and drop an image here, or click to select
                   </p>
@@ -193,28 +194,28 @@ export const ImageProcessor = () => {
 
         {/* Result Section */}
         <div className="space-y-4">
-          <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center min-h-[400px] flex flex-col items-center justify-center">
+          <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 sm:p-8 text-center min-h-[300px] sm:min-h-[400px] flex flex-col items-center justify-center">
             {processedImage ? (
               <div className="space-y-4 w-full">
                 <img
                   src={processedImage}
                   alt="Processed"
-                  className="max-h-[400px] mx-auto rounded-lg object-contain"
+                  className="max-h-[300px] sm:max-h-[400px] mx-auto rounded-lg object-contain"
                 />
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button
                     onClick={() => setIsEditorOpen(true)}
                     className="w-full bg-blue-500 hover:bg-blue-600 text-white"
                   >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Image
+                    <Edit className="h-4 w-4 sm:mr-2" />
+                    <span>Edit Image</span>
                   </Button>
                   <Button
                     onClick={handleDownload}
                     className="w-full bg-green-500 hover:bg-green-600 text-white"
                   >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download
+                    <Download className="h-4 w-4 sm:mr-2" />
+                    <span>Download</span>
                   </Button>
                 </div>
               </div>
@@ -231,7 +232,14 @@ export const ImageProcessor = () => {
         isOpen={isEditorOpen}
         onClose={() => setIsEditorOpen(false)}
         processedImage={processedImage}
-        onImageUpdate={handleImageUpdate}
+        onImageUpdate={(newImage) => {
+          setProcessedImage(newImage);
+          setIsEditorOpen(false);
+          toast({
+            title: "Image Updated",
+            description: "Changes have been applied successfully",
+          });
+        }}
       />
     </div>
   );
