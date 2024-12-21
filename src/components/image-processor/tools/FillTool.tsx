@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { PaintBucket } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { HexColorPicker } from 'react-colorful';
+import { fabric } from 'fabric';
 
 interface FillToolProps {
   fabricCanvas: fabric.Canvas | null;

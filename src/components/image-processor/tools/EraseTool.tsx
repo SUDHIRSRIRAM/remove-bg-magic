@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Eraser } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Slider } from '../../ui/slider';
+import { fabric } from 'fabric';
 
 interface EraseToolProps {
   fabricCanvas: fabric.Canvas | null;
