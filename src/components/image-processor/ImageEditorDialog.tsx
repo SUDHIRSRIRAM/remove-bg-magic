@@ -19,11 +19,13 @@ export const ImageEditorDialog = ({
   processedImage,
   onImageUpdate,
 }: ImageEditorDialogProps) => {
+  if (!processedImage) return null;
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[95vw] w-[1200px] h-[90vh] flex flex-col p-0 gap-0">
+      <DialogContent className="max-w-[95vw] w-[1200px] h-[90vh] flex flex-col p-0 gap-0 fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
         <DialogHeader className="px-4 py-2 flex flex-row items-center justify-between border-b">
-          <DialogTitle>Advanced Image Editor</DialogTitle>
+          <DialogTitle>Image Editor</DialogTitle>
           <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
             <X className="h-4 w-4" />
           </Button>
@@ -43,20 +45,16 @@ export const ImageEditorDialog = ({
             <ScrollArea className="flex-1">
               <div className="p-4">
                 <TabsContent value="tools" className="m-0">
-                  {processedImage && (
-                    <ImageEditorTools
-                      processedImage={processedImage}
-                      onImageUpdate={onImageUpdate}
-                    />
-                  )}
+                  <ImageEditorTools
+                    processedImage={processedImage}
+                    onImageUpdate={onImageUpdate}
+                  />
                 </TabsContent>
                 <TabsContent value="adjust" className="m-0">
-                  {processedImage && (
-                    <ImageAdjustments
-                      processedImage={processedImage}
-                      onImageUpdate={onImageUpdate}
-                    />
-                  )}
+                  <ImageAdjustments
+                    processedImage={processedImage}
+                    onImageUpdate={onImageUpdate}
+                  />
                 </TabsContent>
               </div>
             </ScrollArea>
