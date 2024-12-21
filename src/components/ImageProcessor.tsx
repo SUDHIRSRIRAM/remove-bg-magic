@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { useToast } from "./ui/use-toast";
 import { removeBackground } from "@imgly/background-removal";
-import { SingleImageTab } from "./image-processor/SingleImageTab";
-import { Trash2, Upload, Download } from "lucide-react";
+import { Trash2, Upload, Download, Edit } from "lucide-react";
 import { Button } from "./ui/button";
 import { Progress } from "./ui/progress";
-import { ImageEditor } from "./image-processor/ImageEditor";
+import { ImageEditorDialog } from "./image-processor/ImageEditorDialog";
 
 export const ImageProcessor = () => {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
   const { toast } = useToast();
 
   const handleImageUpload = (file: File) => {
@@ -105,6 +105,7 @@ export const ImageProcessor = () => {
 
   const handleImageUpdate = (newImage: string) => {
     setProcessedImage(newImage);
+    setIsEditorOpen(false);
     toast({
       title: "Image Updated",
       description: "Changes have been applied successfully",
@@ -195,17 +196,27 @@ export const ImageProcessor = () => {
           <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center min-h-[400px] flex flex-col items-center justify-center">
             {processedImage ? (
               <div className="space-y-4 w-full">
-                <ImageEditor 
-                  processedImage={processedImage}
-                  onImageUpdate={handleImageUpdate}
+                <img
+                  src={processedImage}
+                  alt="Processed"
+                  className="max-h-[400px] mx-auto rounded-lg object-contain"
                 />
-                <Button
-                  onClick={handleDownload}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white mt-4"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download Result
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => setIsEditorOpen(true)}
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Image
+                  </Button>
+                  <Button
+                    onClick={handleDownload}
+                    className="w-full bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download
+                  </Button>
+                </div>
               </div>
             ) : (
               <p className="text-gray-400">
@@ -215,6 +226,13 @@ export const ImageProcessor = () => {
           </div>
         </div>
       </div>
+
+      <ImageEditorDialog
+        isOpen={isEditorOpen}
+        onClose={() => setIsEditorOpen(false)}
+        processedImage={processedImage}
+        onImageUpdate={handleImageUpdate}
+      />
     </div>
   );
 };

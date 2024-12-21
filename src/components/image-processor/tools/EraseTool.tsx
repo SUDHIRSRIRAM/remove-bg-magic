@@ -16,9 +16,11 @@ export const EraseTool = ({ fabricCanvas }: EraseToolProps) => {
     if (!fabricCanvas) return;
     
     fabricCanvas.isDrawingMode = true;
-    fabricCanvas.freeDrawingBrush.width = brushSize;
-    fabricCanvas.freeDrawingBrush.color = 'rgba(0,0,0,0)';
-    fabricCanvas.freeDrawingBrush.globalCompositeOperation = 'destination-out';
+    if (fabricCanvas.freeDrawingBrush) {
+      fabricCanvas.freeDrawingBrush.width = brushSize;
+      fabricCanvas.freeDrawingBrush.color = 'rgba(0,0,0,0)';
+      (fabricCanvas.freeDrawingBrush as any).globalCompositeOperation = 'destination-out';
+    }
   };
 
   const stopErasing = () => {
@@ -51,7 +53,7 @@ export const EraseTool = ({ fabricCanvas }: EraseToolProps) => {
             value={[brushSize]}
             onValueChange={([value]) => {
               setBrushSize(value);
-              if (fabricCanvas) {
+              if (fabricCanvas?.freeDrawingBrush) {
                 fabricCanvas.freeDrawingBrush.width = value;
               }
             }}
