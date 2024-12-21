@@ -1,8 +1,11 @@
-import { useState, useRef } from "react";
-import { Crop, Eraser, PaintBucket } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { fabric } from 'fabric';
 import { Button } from "../ui/button";
-import { Slider } from "../ui/slider";
+import { CropTool } from "./tools/CropTool";
+import { EraseTool } from "./tools/EraseTool";
+import { FillTool } from "./tools/FillTool";
 import { MagicBrush } from "./tools/MagicBrush";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 interface ImageEditorProps {
   processedImage: string;
@@ -10,69 +13,72 @@ interface ImageEditorProps {
 }
 
 export const ImageEditor = ({ processedImage, onImageUpdate }: ImageEditorProps) => {
-  const [brightness, setBrightness] = useState(100);
-  const [contrast, setContrast] = useState(100);
+  const [activeTab, setActiveTab] = useState("tools");
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const fabricRef = useRef<fabric.Canvas | null>(null);
 
-  const handleBrightnessChange = (value: number) => {
-    setBrightness(value);
-    if (!imageRef.current) return;
-    imageRef.current.style.filter = `brightness(${value}%) contrast(${contrast}%)`;
-  };
+  useEffect(() => {
+    const img = new Image();
+    img.src = processedImage;
+    img.onload = () => {
+      imageRef.current = img;
+      
+      if (!canvasRef.current) return;
+      
+      fabricRef.current = new fabric.Canvas(canvasRef.current, {
+        width: img.width,
+        height: img.height
+      });
+      
+      fabric.Image.fromURL(processedImage, (fabricImg) => {
+        if (!fabricRef.current) return;
+        fabricRef.current.add(fabricImg);
+        fabricRef.current.renderAll();
+      });
+    };
 
-  const handleContrastChange = (value: number) => {
-    setContrast(value);
-    if (!imageRef.current) return;
-    imageRef.current.style.filter = `brightness(${brightness}%) contrast(${value}%)`;
+    return () => {
+      fabricRef.current?.dispose();
+    };
+  }, [processedImage]);
+
+  const handleSave = () => {
+    if (!fabricRef.current) return;
+    const dataUrl = fabricRef.current.toDataURL({
+      format: 'png',
+      quality: 1
+    });
+    onImageUpdate(dataUrl);
   };
 
   return (
     <div className="space-y-4 w-full">
-      <img
-        ref={imageRef}
-        src={processedImage}
-        alt="Processed"
-        className="processed-image max-h-[400px] mx-auto rounded-lg object-contain"
-      />
-      
-      <div className="flex flex-wrap gap-2 justify-center mt-4">
-        <Button variant="outline" size="sm" className="flex items-center gap-2">
-          <Crop className="w-4 h-4" /> Crop
-        </Button>
-        <Button variant="outline" size="sm" className="flex items-center gap-2">
-          <Eraser className="w-4 h-4" /> Erase
-        </Button>
-        <Button variant="outline" size="sm" className="flex items-center gap-2">
-          <PaintBucket className="w-4 h-4" /> Fill
-        </Button>
-        <MagicBrush 
-          imageRef={imageRef.current} 
-          onImageUpdate={onImageUpdate}
-        />
-      </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="tools">Tools</TabsTrigger>
+          <TabsTrigger value="adjust">Adjust</TabsTrigger>
+        </TabsList>
 
-      <div className="space-y-4 mt-4">
-        <div className="space-y-2">
-          <label className="text-sm text-gray-600">Brightness</label>
-          <Slider
-            value={[brightness]}
-            onValueChange={([value]) => handleBrightnessChange(value)}
-            min={0}
-            max={200}
-            step={1}
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm text-gray-600">Contrast</label>
-          <Slider
-            value={[contrast]}
-            onValueChange={([value]) => handleContrastChange(value)}
-            min={0}
-            max={200}
-            step={1}
-          />
-        </div>
-      </div>
+        <TabsContent value="tools" className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <CropTool imageRef={imageRef.current} onImageUpdate={onImageUpdate} />
+            <EraseTool fabricCanvas={fabricRef.current} />
+            <FillTool fabricCanvas={fabricRef.current} />
+            <MagicBrush imageRef={imageRef.current} onImageUpdate={onImageUpdate} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="adjust" className="space-y-4">
+          {/* Add adjustment controls here */}
+        </TabsContent>
+      </Tabs>
+
+      <canvas ref={canvasRef} className="w-full rounded-lg border" />
+
+      <Button onClick={handleSave} className="w-full">
+        Apply Changes
+      </Button>
     </div>
   );
 };
