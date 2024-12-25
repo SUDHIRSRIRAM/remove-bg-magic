@@ -60,17 +60,35 @@ export const ImageProcessor = () => {
       setIsProcessing(true);
       setProgress(0);
 
-      const response = await fetch(originalImage);
-      const blob = await response.blob();
+      // Convert data URL to Blob
+      const base64Data = originalImage.split(',')[1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'image/png' });
 
       const result = await removeBackground(blob, {
-        progress: (args_0: string, args_1: number) => {
-          setProgress(Math.round(args_1 * 100));
+        progress: (status: string, progress: number) => {
+          setProgress(Math.round(progress * 100));
         },
-        model: "isnet"
+        model: "isnet",
+        debug: true,
+        fetchArgs: {
+          // Ensure proper URL handling
+          mode: 'cors',
+          headers: {
+            'Accept': 'application/json',
+          }
+        }
       });
 
-      setProcessedImage(URL.createObjectURL(result));
+      const resultUrl = URL.createObjectURL(result);
+      setProcessedImage(resultUrl);
       toast({
         title: "Success!",
         description: "Background removed successfully",
@@ -79,7 +97,7 @@ export const ImageProcessor = () => {
       console.error('Error processing image:', error);
       toast({
         title: "Error",
-        description: "Failed to process image",
+        description: "Failed to process image. Please try again.",
         variant: "destructive",
       });
     } finally {
