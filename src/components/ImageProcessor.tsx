@@ -76,14 +76,15 @@ export const ImageProcessor = () => {
       console.log('Starting background removal process...');
       
       const result = await removeBackground(blob, {
-        progress: (_: string, loaded: number, total: number) => {
+        progress: (progress: string, loaded: number, total: number) => {
           const progressValue = (loaded / total) * 100;
           setProgress(Math.round(progressValue));
+          console.log('Progress:', progress, `${Math.round(progressValue)}%`);
         },
-        model: "fast", // Using fast model for better performance
+        model: "isnet",
         proxyToWorker: true,
         debug: true,
-        publicPath: "/",
+        publicPath: window.location.origin + "/",
         fetchArgs: {
           mode: 'cors',
           credentials: 'omit',
@@ -93,11 +94,12 @@ export const ImageProcessor = () => {
             'Content-Type': 'application/json'
           }
         },
-        skipConfidenceCheck: true, // Skip confidence check for faster processing
-        useWorker: true, // Enable web worker for better performance
-        quality: 0.8 // Slightly reduce quality for better performance
+        skipConfidenceCheck: true,
+        useWorker: true,
+        quality: 0.8
       });
 
+      console.log('Background removal completed, creating URL...');
       const resultUrl = URL.createObjectURL(result);
       setProcessedImage(resultUrl);
       
