@@ -73,15 +73,17 @@ export const ImageProcessor = () => {
       const blob = new Blob([byteArray], { type: 'image/png' });
 
       const result = await removeBackground(blob, {
-        progress: (progress: number) => {
-          setProgress(Math.round(progress * 100));
+        progress: (_: string, loaded: number, total: number) => {
+          const progressValue = (loaded / total) * 100;
+          setProgress(Math.round(progressValue));
         },
-        model: "fast",
+        model: "isnet",
         proxyToWorker: true,
-        debug: false,
+        debug: true,
         publicPath: "/",
         fetchArgs: {
-          mode: 'no-cors',
+          mode: 'cors',
+          credentials: 'omit',
           cache: 'force-cache'
         }
       });
