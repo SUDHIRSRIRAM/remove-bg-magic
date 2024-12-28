@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useToast } from "./ui/use-toast";
-import { removeBackground } from "@imgly/background-removal";
+import { removeBackground } from "../lib/background-removal";
 import { UploadSection } from "./image-processor/UploadSection";
 import { ResultSection } from "./image-processor/ResultSection";
 import { ImageEditorDialog } from "./image-processor/ImageEditorDialog";
@@ -60,36 +60,16 @@ export const ImageProcessor = () => {
       setIsProcessing(true);
       setProgress(0);
 
-      // Convert data URL to Blob
-      const base64Data = originalImage.split(',')[1];
-      const byteCharacters = atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length);
-      
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'image/png' });
-
-      const result = await removeBackground(blob, {
-        progress: (status: string, progress: number) => {
-          setProgress(Math.round(progress * 100));
-        },
-        model: "isnet",
-        debug: true,
-        fetchArgs: {
-          mode: 'cors',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          credentials: 'omit'
-        }
+      const img = new Image();
+      img.src = originalImage;
+      await new Promise((resolve) => {
+        img.onload = resolve;
       });
 
+      const result = await removeBackground(img);
       const resultUrl = URL.createObjectURL(result);
       setProcessedImage(resultUrl);
+      
       toast({
         title: "Success!",
         description: "Background removed successfully",
