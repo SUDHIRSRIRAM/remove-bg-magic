@@ -79,11 +79,12 @@ export const ImageProcessor = () => {
         model: "isnet",
         debug: true,
         fetchArgs: {
-          // Ensure proper URL handling
           mode: 'cors',
           headers: {
             'Accept': 'application/json',
-          }
+            'Content-Type': 'application/json',
+          },
+          credentials: 'omit'
         }
       });
 
