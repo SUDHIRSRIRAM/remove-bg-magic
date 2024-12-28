@@ -23,6 +23,7 @@ export const ImageProcessor = () => {
       return;
     }
 
+    // Compress image before processing
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result) {
@@ -72,20 +73,29 @@ export const ImageProcessor = () => {
       const byteArray = new Uint8Array(byteNumbers);
       const blob = new Blob([byteArray], { type: 'image/png' });
 
+      console.log('Starting background removal process...');
+      
       const result = await removeBackground(blob, {
         progress: (_: string, loaded: number, total: number) => {
           const progressValue = (loaded / total) * 100;
           setProgress(Math.round(progressValue));
         },
-        model: "isnet",
+        model: "fast", // Using fast model for better performance
         proxyToWorker: true,
         debug: true,
         publicPath: "/",
         fetchArgs: {
           mode: 'cors',
           credentials: 'omit',
-          cache: 'force-cache'
-        }
+          cache: 'force-cache',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        },
+        skipConfidenceCheck: true, // Skip confidence check for faster processing
+        useWorker: true, // Enable web worker for better performance
+        quality: 0.8 // Slightly reduce quality for better performance
       });
 
       const resultUrl = URL.createObjectURL(result);
