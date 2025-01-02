@@ -59,6 +59,7 @@ export const ImageProcessor = () => {
     try {
       setIsProcessing(true);
       setProgress(0);
+      console.log('Starting image processing...');
 
       const base64Data = originalImage.split(',')[1];
       const byteCharacters = atob(base64Data);
@@ -71,36 +72,32 @@ export const ImageProcessor = () => {
       const byteArray = new Uint8Array(byteNumbers);
       const blob = new Blob([byteArray], { type: 'image/png' });
 
-      console.log('Starting background removal process...');
+      console.log('Converting image to blob completed');
       
       const result = await removeBackground(blob, {
         progress: (progress: string, loaded: number, total: number) => {
           const progressValue = (loaded / total) * 100;
           setProgress(Math.round(progressValue));
-          console.log('Progress:', progress, `${Math.round(progressValue)}%`);
+          console.log('Processing progress:', progress, `${Math.round(progressValue)}%`);
         },
         model: "isnet",
         proxyToWorker: true,
         debug: true,
-        publicPath: window.location.origin + "/",
+        publicPath: "/",
         fetchArgs: {
           mode: 'cors',
           credentials: 'omit',
           cache: 'force-cache',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
         },
         output: {
           quality: 0.8,
           format: 'image/png'
-        },
-        useWorker: true
+        }
       });
 
-      console.log('Background removal completed, creating URL...');
+      console.log('Background removal completed');
       const resultUrl = URL.createObjectURL(result);
+      console.log('Result URL created:', resultUrl);
       setProcessedImage(resultUrl);
       
       toast({
