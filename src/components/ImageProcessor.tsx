@@ -59,47 +59,18 @@ export const ImageProcessor = () => {
     try {
       setIsProcessing(true);
       setProgress(0);
-      console.log('Starting image processing...');
 
-      const base64Data = originalImage.split(',')[1];
-      const byteCharacters = atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length);
-      
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'image/png' });
+      const response = await fetch(originalImage);
+      const blob = await response.blob();
 
-      console.log('Converting image to blob completed');
-      
       const result = await removeBackground(blob, {
-        progress: (progress: string, loaded: number, total: number) => {
-          const progressValue = (loaded / total) * 100;
-          setProgress(Math.round(progressValue));
-          console.log('Processing progress:', progress, `${Math.round(progressValue)}%`);
+        progress: (args_0: string, args_1: number) => {
+          setProgress(Math.round(args_1 * 100));
         },
-        model: "isnet",
-        proxyToWorker: true,
-        debug: true,
-        publicPath: "/",
-        fetchArgs: {
-          mode: 'cors',
-          credentials: 'omit',
-          cache: 'force-cache',
-        },
-        output: {
-          quality: 0.8,
-          format: 'image/png'
-        }
+        model: "isnet"
       });
 
-      console.log('Background removal completed');
-      const resultUrl = URL.createObjectURL(result);
-      console.log('Result URL created:', resultUrl);
-      setProcessedImage(resultUrl);
-      
+      setProcessedImage(URL.createObjectURL(result));
       toast({
         title: "Success!",
         description: "Background removed successfully",
@@ -108,7 +79,7 @@ export const ImageProcessor = () => {
       console.error('Error processing image:', error);
       toast({
         title: "Error",
-        description: "Failed to process image. Please try again.",
+        description: "Failed to process image",
         variant: "destructive",
       });
     } finally {
