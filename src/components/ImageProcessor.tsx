@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useToast } from "./ui/use-toast";
 import { removeBackground } from "@imgly/background-removal";
-import { UploadSection } from "./image-processor/UploadSection";
-import { ResultSection } from "./image-processor/ResultSection";
+import { Trash2, Upload, Download, Edit } from "lucide-react";
+import { Button } from "./ui/button";
+import { Progress } from "./ui/progress";
 import { ImageEditorDialog } from "./image-processor/ImageEditorDialog";
 
 export const ImageProcessor = () => {
@@ -112,32 +113,118 @@ export const ImageProcessor = () => {
   };
 
   return (
-    <section className="w-full max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <div className="w-full max-w-6xl mx-auto px-4 py-8 space-y-8 bg-gradient-to-b from-white to-gray-50">
       <div className="text-center space-y-4">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 gradient-text">
+        <h1 className="text-4xl font-bold text-gray-900 gradient-text">
           Image Background Remover
         </h1>
-        <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           Upload your image and we'll remove the background instantly
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4 sm:gap-8">
-        <UploadSection
-          originalImage={originalImage}
-          isProcessing={isProcessing}
-          progress={progress}
-          onImageUpload={handleImageUpload}
-          onProcess={processImage}
-          onDelete={handleDelete}
-          handleDrop={handleDrop}
-        />
-        
-        <ResultSection
-          processedImage={processedImage}
-          onEdit={() => setIsEditorOpen(true)}
-          onDownload={handleDownload}
-        />
+      <div className="grid md:grid-cols-2 gap-8">
+        {/* Upload Section */}
+        <div className="space-y-4">
+          <div
+            onDrop={handleDrop}
+            onDragOver={(e) => e.preventDefault()}
+            className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center transition-all duration-300 hover:border-primary/50"
+          >
+            {originalImage ? (
+              <div className="space-y-4">
+                <img
+                  src={originalImage}
+                  alt="Original"
+                  className="max-h-[400px] mx-auto rounded-lg object-contain"
+                />
+                <div className="flex gap-2 justify-center">
+                  <Button
+                    onClick={processImage}
+                    disabled={isProcessing}
+                    className="w-full bg-primary hover:bg-primary/90 text-white"
+                  >
+                    {isProcessing ? (
+                      <div className="w-full space-y-2">
+                        <span>Processing... {progress}%</span>
+                        <Progress value={progress} className="w-full" />
+                      </div>
+                    ) : (
+                      "Remove Background"
+                    )}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={handleDelete}
+                    className="px-3"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpload(file);
+                  }}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <label
+                  htmlFor="image-upload"
+                  className="cursor-pointer block p-8"
+                >
+                  <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-2">
+                    Drag and drop an image here, or click to select
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Supports JPG, PNG and WEBP
+                  </p>
+                </label>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Result Section */}
+        <div className="space-y-4">
+          <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center min-h-[400px] flex flex-col items-center justify-center">
+            {processedImage ? (
+              <div className="space-y-4 w-full">
+                <img
+                  src={processedImage}
+                  alt="Processed"
+                  className="max-h-[400px] mx-auto rounded-lg object-contain"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => setIsEditorOpen(true)}
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Image
+                  </Button>
+                  <Button
+                    onClick={handleDownload}
+                    className="w-full bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-400">
+                Processed image will appear here
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       <ImageEditorDialog
@@ -146,6 +233,6 @@ export const ImageProcessor = () => {
         processedImage={processedImage}
         onImageUpdate={handleImageUpdate}
       />
-    </section>
+    </div>
   );
 };
