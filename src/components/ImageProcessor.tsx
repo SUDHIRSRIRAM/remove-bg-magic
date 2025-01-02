@@ -23,7 +23,6 @@ export const ImageProcessor = () => {
       return;
     }
 
-    // Compress image before processing
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result) {
@@ -61,7 +60,6 @@ export const ImageProcessor = () => {
       setIsProcessing(true);
       setProgress(0);
 
-      // Convert data URL to Blob
       const base64Data = originalImage.split(',')[1];
       const byteCharacters = atob(base64Data);
       const byteNumbers = new Array(byteCharacters.length);
@@ -94,9 +92,11 @@ export const ImageProcessor = () => {
             'Content-Type': 'application/json'
           }
         },
-        skipConfidenceCheck: true,
-        useWorker: true,
-        quality: 0.8
+        output: {
+          quality: 0.8,
+          format: 'image/png'
+        },
+        useWorker: true
       });
 
       console.log('Background removal completed, creating URL...');
